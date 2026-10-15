@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý hóa đơn</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: white;
+        }
+
+        /* Thanh trên cùng */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 25px;
+            background: #080d18;
+            border-bottom: 1px solid #263047;
+        }
+
+        .topbar h3 {
+            margin: 0;
+            color: #c4b5fd;
+        }
+
+        select, input {
+            padding: 11px;
+            border: 1px solid #303b53;
+            border-radius: 7px;
+            background: #111827;
+            color: white;
+        }
+
+        button {
+            padding: 11px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #8055ed;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #9b72ff;
+        }
+
+        /* Bố cục chính */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 65px);
+        }
+
+        /* Menu bên trái */
+        .sidebar {
+            width: 240px;
+            padding: 25px 15px;
+            background: #080d18;
+            border-right: 1px solid #263047;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 45px;
+        }
+
+        .menu {
+            padding: 15px 10px;
+            margin-bottom: 10px;
+            color: #a5b4c8;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .menu:hover, .menu.active {
+            background: #20213f;
+            color: white;
+        }
+
+        /* Nội dung bên phải */
+        .content {
+            flex: 1;
+            min-width: 0;
+            padding: 30px;
+            background: radial-gradient(
+                circle at top right,
+                #211943,
+                #0b1020 65%
+            );
+        }
+
+        .subtitle {
+            color: #bd8cff;
+            font-size: 13px;
+        }
+
+        .content h1 {
+            margin-top: 10px;
+            font-size: 30px;
+        }
+
+        .description {
+            color: #9caec9;
+        }
+
+        /* Thanh địa chỉ trang */
+        .browser {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px;
+            margin: 25px 0;
+            background: #111629;
+            border: 1px solid #263047;
+        }
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background: #ef4444;
+        }
+
+        .yellow {
+            background: #f59e0b;
+        }
+
+        .green {
+            background: #10b981;
+        }
+
+        .address {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            background: #080d18;
+            border-radius: 5px;
+            color: #93c5fd;
+        }
+
+        /* Bảng hóa đơn */
+        .panel {
+            padding: 25px;
+            background: #101629;
+            border: 1px solid #263047;
+            border-radius: 12px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .filter {
+            background: #111827;
+            border: 1px solid #303b53;
+        }
+
+        .filter.active {
+            background: #8055ed;
+        }
+
+        #search {
+            margin-left: auto;
+            width: 230px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            color: #9caec9;
+            background: #080d18;
+        }
+
+        td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #263047;
+        }
+
+        .amount {
+            color: #ff6969;
+            font-weight: bold;
+        }
+
+        .days {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #3b1d2d;
+            color: #ff8585;
+            font-size: 12px;
+        }
+
+        .remind {
+            white-space: nowrap;
+        }
+
+        #message {
+            display: none;
+            padding: 12px;
+            margin-bottom: 20px;
+            background: #12352f;
+            color: #9af0d2;
+            border-radius: 8px;
+        }
+
+        #empty {
+            display: none;
+            padding: 20px;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* Giao diện điện thoại */
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .content h1 {
+                font-size: 24px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+
+            #search {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .sidebar {
+                display: none;
+            }
+
+            .topbar {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .topbar h3 {
+                font-size: 14px;
+            }
+
+            .topbar select {
+                width: 145px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Thanh trên cùng -->
+    <div class="topbar">
+        <h3>Quản lý hóa đơn</h3>
+
+        <select id="pageSelect">
+            <option value="overdue">Hóa đơn quá hạn</option>
+            <option value="all">Tất cả hóa đơn</option>
+        </select>
+    </div>
+
+    <div class="container">
+
+        <!-- Menu bên trái -->
+        <div class="sidebar">
+            <h2>Quản lý</h2>
+
+            <div class="menu" data-page="overview">
+                ◷ &nbsp; Tổng quan công nợ
+            </div>
+
+            <div class="menu active" data-page="overdue">
+                ⓘ &nbsp; Hóa đơn quá hạn
+            </div>
+
+            <div class="menu" data-page="forecast">
+                ↗ &nbsp; Dự báo dòng tiền
+            </div>
+        </div>
+
+        <!-- Nội dung chính -->
+        <div class="content">
+
+            <div class="subtitle">
+                QUẢN LÝ CÔNG NỢ / THEO DÕI THANH TOÁN
+            </div>
+
+            <h1 id="pageTitle">Quản lý hóa đơn quá hạn</h1>
+
+            <p class="description">
+                Theo dõi các khoản nợ và nhắc khách hàng thanh toán.
+            </p>
+
+            <div class="browser">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+
+                <div class="address">quanlyhoadon.local/hoa-don</div>
+            </div>
+
+            <div class="panel">
+
+                <!-- Các nút lọc và ô tìm kiếm -->
+                <div class="toolbar">
+
+                    <button class="filter active" data-filter="all">
+                        Tất cả quá hạn
+                    </button>
+
+                    <button class="filter" data-filter="under30">
+                        Quá hạn dưới 30 ngày
+                    </button>
+
+                    <button class="filter" data-filter="over30">
+                        Quá hạn từ 30 ngày
+                    </button>
+
+                    <input
+                        type="text"
+                        id="search"
+                        placeholder="Tìm tên khách hàng hoặc mã HĐ..."
+                    >
+
+                    <button id="searchBtn">Lọc</button>
+
+                </div>
+
+                <div id="message"></div>
+
+                <!-- Bảng danh sách hóa đơn -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>MÃ HĐ</th>
+                                <th>KHÁCH HÀNG</th>
+                                <th>NGÀY PHÁT HÀNH</th>
+                                <th>HẠN THANH TOÁN</th>
+                                <th>SỐ TIỀN (VNĐ)</th>
+                                <th>SỐ NGÀY QUÁ HẠN</th>
+                                <th>THAO TÁC</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="invoiceList">
+
+                            <tr data-id="HD-008"
+                                data-customer="Tập đoàn Minh An"
+                                data-days="15">
+
+                                <td><strong>HD-008</strong></td>
+                                <td>Tập đoàn Minh An</td>
+                                <td>15/09/2026</td>
+                                <td>30/09/2026</td>
+                                <td class="amount">30.000.000</td>
+                                <td><span class="days">15 ngày</span></td>
+
+                                <td>
+                                    <button class="remind">
+                                        Gửi nhắc nợ
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr data-id="HD-003"
+                                data-customer="Công ty Sao Việt"
+                                data-days="45">
+
+                                <td><strong>HD-003</strong></td>
+                                <td>Công ty Sao Việt</td>
+                                <td>10/08/2026</td>
+                                <td>25/08/2026</td>
+                                <td class="amount">45.000.000</td>
+                                <td><span class="days">45 ngày</span></td>
+
+                                <td>
+                                    <button class="remind">
+                                        Gửi nhắc nợ
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr data-id="HD-011"
+                                data-customer="Cửa hàng An Phát"
+                                data-days="8">
+
+                                <td><strong>HD-011</strong></td>
+                                <td>Cửa hàng An Phát</td>
+                                <td>01/10/2026</td>
+                                <td>07/10/2026</td>
+                                <td class="amount">12.500.000</td>
+                                <td><span class="days">8 ngày</span></td>
+
+                                <td>
+                                    <button class="remind">
+                                        Gửi nhắc nợ
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                    <div id="empty">
+                        Không tìm thấy hóa đơn phù hợp.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lưu loại bộ lọc đang được chọn
+        let currentFilter = "all";
+
+        // Hàm lọc hóa đơn
+        function filterInvoices() {
+            let keyword = document.getElementById("search")
+                .value.toLowerCase().trim();
+
+            let rows = document.querySelectorAll("#invoiceList tr");
+            let count = 0;
+
+            rows.forEach(function(row) {
+                let id = row.dataset.id.toLowerCase();
+                let customer = row.dataset.customer.toLowerCase();
+                let days = Number(row.dataset.days);
+
+                let matchSearch =
+                    id.includes(keyword) || customer.includes(keyword);
+
+                let matchFilter = true;
+
+                if (currentFilter === "under30") {
+                    matchFilter = days < 30;
+                }
+
+                if (currentFilter === "over30") {
+                    matchFilter = days >= 30;
+                }
+
+                if (matchSearch && matchFilter) {
+                    row.style.display = "";
+                    count++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Hiện thông báo khi không có kết quả
+            document.getElementById("empty").style.display =
+                count === 0 ? "block" : "none";
+        }
+
+        // Xử lý các nút lọc
+        let filterButtons = document.querySelectorAll(".filter");
+
+        filterButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                filterButtons.forEach(function(item) {
+                    item.classList.remove("active");
+                });
+
+                button.classList.add("active");
+
+                currentFilter = button.dataset.filter;
+
+                filterInvoices();
+            });
+        });
+
+        // Tìm kiếm khi nhập từ khóa hoặc nhấn nút Lọc
+        document.getElementById("searchBtn")
+            .addEventListener("click", filterInvoices);
+
+        document.getElementById("search")
+            .addEventListener("input", filterInvoices);
+
+        // Chức năng nhắc nợ mô phỏng
+        let remindButtons = document.querySelectorAll(".remind");
+
+        remindButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                let row = button.closest("tr");
+
+                let customer = row.dataset.customer;
+                let id = row.dataset.id;
+
+                let message = document.getElementById("message");
+
+                message.textContent =
+                    "Đã ghi nhận nhắc thanh toán cho " +
+                    customer + " - hóa đơn " + id +
+                    ". Đây là chức năng mô phỏng, chưa gửi email thật.";
+
+                message.style.display = "block";
+            });
+        });
+
+        // Chuyển mục menu bên trái
+        let menuItems = document.querySelectorAll(".menu");
+
+        menuItems.forEach(function(item) {
+            item.addEventListener("click", function() {
+                menuItems.forEach(function(menu) {
+                    menu.classList.remove("active");
+                });
+
+                item.classList.add("active");
+
+                let page = item.dataset.page;
+                let title = document.getElementById("pageTitle");
+
+                if (page === "overview") {
+                    title.textContent = "Tổng quan công nợ";
+                } else if (page === "forecast") {
+                    title.textContent = "Dự báo dòng tiền";
+                } else {
+                    title.textContent = "Quản lý hóa đơn quá hạn";
+                }
+            });
+        });
+
+        // Chọn loại trang ở thanh trên cùng
+        document.getElementById("pageSelect")
+            .addEventListener("change", function() {
+                let title = document.getElementById("pageTitle");
+
+                if (this.value === "all") {
+                    title.textContent = "Tất cả hóa đơn";
+                } else {
+                    title.textContent = "Quản lý hóa đơn quá hạn";
+                }
+            });
+    </script>
+
+</body>
+</html>
+```
