@@ -1,1 +1,8 @@
-# ktragki
+- InvoicePilot – Theo dõi hóa đơn và công nợ
+- [ ] Tên trang đã thực hiện: Quản lý hóa đơn quá hạn
+- [ ] Mục đích của trang: Quản lý hóa đơn quá hạn
+- [ ] Các chức năng chính: Quản lý hóa đơn quá hạn, tìm hóa đơn dựa theo mã hợp đồng hoặc tên khách hàng.
+- [ ] Công nghệ sử dụng:Figma, chatgpt;
+- [ ] Link Figma: https://www.figma.com/design/yy62XMAparIRsStP8mNi5I/Untitled?node-id=3-941&t=yPAELSwg0yvdPFpU-1
+- [ ] Link video: https://youtu.be/-EkaA1Q6DTA
+- [ ] Link GitHub: https://github.com/QNTTQT/ktragki
